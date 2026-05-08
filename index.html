@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="theme-happy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公司今天表現的怎麼樣? 🌸🔥</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <span class="happy-icon">☁️ 朋友們的泡泡基地</span>
+            <span class="angry-icon">💢 媽蛋破公司又來</span>
+        </div>
+        <div class="auth-section">
+            <button id="login-btn">Google 登入</button>
+            <div id="user-info" class="hidden">
+                <img id="user-photo" src="" alt="avatar">
+                <input type="text" id="nickname-input" placeholder="設定你的暱稱...">
+                <button id="save-nickname-btn">儲存暱稱</button>
+                <button id="logout-btn">登出</button>
+            </div>
+        </div>        
+        <div class="theme-toggle">
+            <span>Happy</span>
+            <label class="switch">
+                <input type="checkbox" id="themeSwitch">
+                <span class="slider round"></span>
+            </label>
+            <span>Angry</span>
+        </div>
+    </header>
+
+    <div id="modal-overlay" class="hidden">
+        <div id="record-modal">
+            <h3 id="modal-date-title">日期</h3>
+            
+            <div id="record-edit-view">
+                <input type="text" id="record-title" placeholder="這件事的標題...">
+                <textarea id="record-content" placeholder="詳細發生了什麼事..."></textarea>
+                <div class="index-selector">
+                    <span id="index-label">指數：</span>
+                    <select id="emotion-index">
+                        <option value="1">1 (輕微)</option>
+                        <option value="2">2 (白眼)</option>
+                        <option value="3">3 (操)</option>
+                        <option value="4">4 (操操操)</option>
+                        <option value="5">5 (離職幹)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="record-detail-view" class="hidden">
+                <h4 id="view-title"></h4>
+                <p id="view-content"></p>
+                <hr>
+            </div>
+
+            <div id="comments-section" class="comments-section hidden">
+                <h5>💬 留言互動</h5>
+                <div id="comments-list"></div>
+                <div class="comment-input-group">
+                    <input type="text" id="new-comment-input" placeholder="回覆點什麼...">
+                    <button id="submit-comment-btn">發送</button>
+                </div>
+            </div>
+
+            <div class="modal-btns">
+                <button id="close-modal" style="background: #999;">關閉</button>
+                <button id="save-record">儲存紀錄</button>
+            </div>
+        </div>
+    </div>
+
+    <section id="friends-section" class="hidden">
+        <div class="friends-container">
+            <h4>👯 朋友們</h4>
+            <div class="search-box">
+                <input type="text" id="friend-search-input" placeholder="輸入朋友暱稱並按下加好友...">
+                <button id="add-friend-btn">加好友</button>
+            </div>
+            <ul id="friends-list"></ul>
+        </div>
+    </section>
+
+    <main>
+        <section id="stats-section" class="stats-container">
+            <div class="stats-card month-stats">
+                <h5>本月統計</h5>
+                <div class="stats-row">
+                    <span>☁️ 快樂總合: <strong id="month-happy-sum">0</strong></span>
+                    <span>🔥 生氣總合: <strong id="month-angry-sum">0</strong></span>
+                </div>
+            </div>
+            <div class="stats-card total-stats">
+                <h5>年度累計 (總合)</h5>
+                <div class="stats-row">
+                    <span>✨ 快樂能量: <strong id="total-happy-sum">0</strong></span>
+                    <span>💢 怒火值: <strong id="total-angry-sum">0</strong></span>
+                </div>
+            </div>
+        </section>
+        <div id="calendar-header">
+            <button id="prevMonth">◀</button>
+            <h2 id="monthDisplay">載入中...</h2>
+            <button id="nextMonth">▶</button>
+        </div>
+        <div id="calendar-grid" class="calendar"></div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, setDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEPwpz4a0jbCWZ_N-peJydCPVTHg4TU-A",
+            authDomain: "mood-calendar-sail.firebaseapp.com",
+            projectId: "mood-calendar-sail",
+            storageBucket: "mood-calendar-sail.firebasestorage.app",
+            messagingSenderId: "962446738343",
+            appId: "1:962446738343:web:418d197331ee97cd46ec82"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+        window.auth = getAuth(app);
+
+        window.FirebaseMethods = { 
+            collection, addDoc, getDocs, query, where, doc, getDoc, setDoc, orderBy,
+            signInWithPopup, signOut, onAuthStateChanged 
+        };
+        window.FirebaseProviders = { GoogleAuthProvider };
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
