@@ -42,38 +42,33 @@ function initLogic() {
     let myFriendsUids = [];
     let currentViewingRecordId = null;
 
+    // --- ✨ 雙向好友邏輯 (已修復重複定義問題) ---
     addFriendBtn.onclick = async () => {
-            const name = friendSearchInput.value.trim();
-            if (!name || name === userNickname) return alert("請輸入有效的暱稱");
+        const name = friendSearchInput.value.trim();
+        if (!name || name === userNickname) return alert("請輸入有效的暱稱");
+        
+        try {
+            const q = query(collection(window.db, "users"), where("nickname", "==", name));
+            const snap = await getDocs(q);
+            if (snap.empty) return alert("找不到人");
             
-            try {
-                const q = query(collection(window.db, "users"), where("nickname", "==", name));
-                const snap = await getDocs(q);
-                
-                if (snap.empty) return alert("找不到人");
-                
-                const friendUid = snap.docs[0].id;
+            const friendData = snap.docs[0].data();
+            const friendUid = snap.docs[0].id;
 
-                // 1. 加對方到「我的」好友名單
-                await setDoc(doc(window.db, "users", currentUser.uid, "friends", friendUid), { 
-                    nickname: name 
-                });
-                
-                // 2. 加我到「對方的」好友名單 (雙向同步)
-                await setDoc(doc(window.db, "users", friendUid, "friends", currentUser.uid), { 
-                    nickname: userNickname 
-                });
-                
-                alert(`已與 ${name} 互加為好友！`);
-                friendSearchInput.value = "";
-                fetchFriendsAndData();
-            } catch (e) {
-                console.error(e);
-                alert("好友添加失敗，請檢查權限設定");
-            }
-        };
+            // 1. 加對方到我的好友名單
+            await setDoc(doc(window.db, "users", currentUser.uid, "friends", friendUid), { nickname: name });
+            // 2. 加我到對方的好友名單 (雙向同步)
+            await setDoc(doc(window.db, "users", friendUid, "friends", currentUser.uid), { nickname: userNickname });
+            
+            alert(`已與 ${name} 互加為好友！`);
+            friendSearchInput.value = "";
+            fetchFriendsAndData();
+        } catch (e) {
+            console.error(e);
+            alert("好友添加失敗，請檢查權限設定");
+        }
+    };
 
-    // --- 時間格式化 ---
     function formatTime(timestamp) {
         if (!timestamp) return "";
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -122,10 +117,8 @@ function initLogic() {
         const month = currentDate.getMonth();
         monthDisplay.innerText = `${year}年 ${month + 1}月`;
         const currentTheme = themeSwitch.checked ? 'angry' : 'happy';
-
         let dailyRecords = {};
         let allRecordsForStats = [];
-        
         if (currentUser && myFriendsUids.length > 0) {
             try {
                 const q = query(collection(window.db, "records"), where("uid", "in", myFriendsUids));
@@ -140,26 +133,22 @@ function initLogic() {
                 updateStatistics(allRecordsForStats, year, month);
             } catch (e) { console.error("資料讀取失敗", e); }
         }
-
         const firstDay = new Date(year, month, 1).getDay();
         for (let i = 0; i < firstDay; i++) calendarGrid.appendChild(document.createElement('div'));
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const todayEnd = new Date();
         todayEnd.setHours(23, 59, 59, 999);
-
         for (let day = 1; day <= daysInMonth; day++) {
             const dateDiv = document.createElement('div');
             dateDiv.classList.add('calendar-day');
             const dStr = `${year}-${month + 1}-${day}`;
             dateDiv.innerHTML = `<span>${day}</span>`;
-
             if (dailyRecords[dStr]) {
                 dailyRecords[dStr].forEach(rec => {
                     if (rec.type === currentTheme) {
                         const icon = rec.type === 'angry' ? '🔥' : '☁️';
                         const item = document.createElement('div');
                         item.className = "record-item";
-                        // ✅ 這裡使用發文時存下的或好友的 Emoji
                         const displayEmoji = rec.userEmoji || "👤";
                         item.innerText = `${icon}${displayEmoji} ${rec.userName}`;
                         item.onclick = (e) => { e.stopPropagation(); openViewModal(rec); };
@@ -167,7 +156,6 @@ function initLogic() {
                     }
                 });
             }
-
             const targetDate = new Date(year, month, day);
             if (targetDate <= todayEnd) {
                 dateDiv.classList.add('clickable');
@@ -199,7 +187,6 @@ function initLogic() {
             const data = doc.data();
             const div = document.createElement('div');
             const isMine = data.uid === currentUser.uid;
-            // ✅ 加入時間顯示
             const timeStr = formatTime(data.createdAt);
             div.className = `comment-bubble ${isMine ? 'my-comment' : ''}`;
             div.innerHTML = `
@@ -252,17 +239,6 @@ function initLogic() {
         fetchFriendsAndData();
     };
 
-    addFriendBtn.onclick = async () => {
-        const name = friendSearchInput.value.trim();
-        if (!name || name === userNickname) return;
-        const q = query(collection(window.db, "users"), where("nickname", "==", name));
-        const snap = await getDocs(q);
-        if (snap.empty) return alert("找不到人");
-        await setDoc(doc(window.db, "users", currentUser.uid, "friends", snap.docs[0].id), { nickname: name });
-        alert("成功添加好友！");
-        fetchFriendsAndData();
-    };
-
     function openEditModal(dateStr) {
         selectedDateStr = dateStr; currentViewingRecordId = null;
         document.getElementById('modal-date-title').innerText = dateStr + " (寫日記)";
@@ -296,20 +272,14 @@ function initLogic() {
     async function fetchFriendsAndData() {
         if (!currentUser) return;
         myFriendsUids = [currentUser.uid];
-        myFriendsMap = {};
         friendsListUI.innerHTML = "";
-
         const snap = await getDocs(collection(window.db, "users", currentUser.uid, "friends"));
-        
-        // 抓取好友的詳細資料 (包含最新 Emoji)
         for (const fDoc of snap.docs) {
             const friendId = fDoc.id;
             const friendSnap = await getDoc(doc(window.db, "users", friendId));
             if (friendSnap.exists()) {
                 const data = friendSnap.data();
                 myFriendsUids.push(friendId);
-                myFriendsMap[friendId] = data;
-                
                 const li = document.createElement('li');
                 li.innerText = `${data.emoji || "👤"} ${data.nickname}`;
                 friendsListUI.appendChild(li);
@@ -338,5 +308,8 @@ function initLogic() {
             renderCalendar();
         }
     });
+
+    updateEmotionOptions(false);
 }
+
 startApp();
