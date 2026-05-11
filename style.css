@@ -214,3 +214,36 @@ button { background: var(--accent-color); color: white; border: none; padding: 8
 input:checked + .slider { background-color: #ef4444; }
 input:checked + .slider:before { transform: translateX(23px); }
 .theme-happy .angry-icon, .theme-angry .happy-icon { display: none !important; }
+
+/* ✅ 修正：彈窗按鈕統一靠右 */
+.modal-btns { 
+    display: flex; 
+    justify-content: flex-end; /* 靠右 */
+    gap: 10px; 
+    margin-top: 10px; 
+}
+
+/* ✅ 修正：留言發送按鈕靠右 */
+.comment-input-group { 
+    display: flex; 
+    flex-direction: column; /* 改為垂直排列以便按鈕靠右 */
+    gap: 8px; 
+}
+
+.comment-input-group button {
+    align-self: flex-end; /* 按鈕單獨靠右 */
+}
+
+/* ✅ 修正：使用者設定區塊按鈕對齊 */
+#user-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end; /* 讓內容往右靠 */
+    align-items: center;
+}
+
+/* 針對手機版的微調 */
+@media (max-width: 600px) {
+    #user-info { justify-content: center; } /* 手機版維持置中避免跑版 */
+}

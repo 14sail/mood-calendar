@@ -20,7 +20,7 @@ function initLogic() {
     const loginBtn = document.getElementById('login-btn');
     const userInfo = document.getElementById('user-info');
     const nicknameInput = document.getElementById('nickname-input');
-    const emojiInput = document.getElementById('user-emoji-input'); // ✅ 新增
+    const emojiInput = document.getElementById('user-emoji-input');
     const saveNicknameBtn = document.getElementById('save-nickname-btn');
     const friendSearchInput = document.getElementById('friend-search-input');
     const addFriendBtn = document.getElementById('add-friend-btn');
@@ -37,11 +37,41 @@ function initLogic() {
     let currentDate = new Date();
     let currentUser = null;
     let userNickname = "匿名人士";
-    let userEmoji = "👤"; // ✅ 新增預設 Emoji
+    let userEmoji = "👤";
     let selectedDateStr = "";
     let myFriendsUids = [];
-    let myFriendsMap = {}; // ✅ 儲存好友的詳細資料 (包含 Emoji)
     let currentViewingRecordId = null;
+
+    addFriendBtn.onclick = async () => {
+            const name = friendSearchInput.value.trim();
+            if (!name || name === userNickname) return alert("請輸入有效的暱稱");
+            
+            try {
+                const q = query(collection(window.db, "users"), where("nickname", "==", name));
+                const snap = await getDocs(q);
+                
+                if (snap.empty) return alert("找不到人");
+                
+                const friendUid = snap.docs[0].id;
+
+                // 1. 加對方到「我的」好友名單
+                await setDoc(doc(window.db, "users", currentUser.uid, "friends", friendUid), { 
+                    nickname: name 
+                });
+                
+                // 2. 加我到「對方的」好友名單 (雙向同步)
+                await setDoc(doc(window.db, "users", friendUid, "friends", currentUser.uid), { 
+                    nickname: userNickname 
+                });
+                
+                alert(`已與 ${name} 互加為好友！`);
+                friendSearchInput.value = "";
+                fetchFriendsAndData();
+            } catch (e) {
+                console.error(e);
+                alert("好友添加失敗，請檢查權限設定");
+            }
+        };
 
     // --- 時間格式化 ---
     function formatTime(timestamp) {
@@ -308,8 +338,5 @@ function initLogic() {
             renderCalendar();
         }
     });
-
-    updateEmotionOptions(false);
 }
-
 startApp();
