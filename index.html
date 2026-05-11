@@ -17,8 +17,9 @@
             <button id="login-btn">Google 登入</button>
             <div id="user-info" class="hidden">
                 <img id="user-photo" src="" alt="avatar">
+                <input type="text" id="user-emoji-input" placeholder="圖示" maxlength="2" style="width: 40px; text-align: center;">
                 <input type="text" id="nickname-input" placeholder="設定你的暱稱...">
-                <button id="save-nickname-btn">儲存暱稱</button>
+                <button id="save-nickname-btn">儲存</button>
                 <button id="logout-btn">登出</button>
             </div>
         </div>        
@@ -41,18 +42,13 @@
                 <textarea id="record-content" placeholder="詳細發生了什麼事..."></textarea>
                 <div class="index-selector">
                     <span id="index-label">指數：</span>
-                    <select id="emotion-index">
-                        <option value="1">1 (輕微)</option>
-                        <option value="2">2 (白眼)</option>
-                        <option value="3">3 (操)</option>
-                        <option value="4">4 (操操操)</option>
-                        <option value="5">5 (離職幹)</option>
-                    </select>
+                    <select id="emotion-index"></select>
                 </div>
             </div>
 
             <div id="record-detail-view" class="hidden">
                 <h4 id="view-title"></h4>
+                <div id="view-time" style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 10px;"></div>
                 <p id="view-content"></p>
                 <hr>
             </div>

@@ -20,7 +20,7 @@ body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     transition: all 0.3s ease;
     margin: 0; 
-    padding: 10px; /* 手機版減少邊距 */
+    padding: 10px;
     display: flex; 
     flex-direction: column; 
     align-items: center;
@@ -173,10 +173,40 @@ html.theme-angry .record-item { background: rgba(0,0,0,0.5); color: white; }
 #record-modal input, #record-modal textarea, #record-modal select { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 10px; border: 1px solid #ddd; background: var(--card-bg); color: var(--text-color); }
 .comments-section { border-top: 2px solid #e2e8f0; padding-top: 10px; }
 #comments-list { max-height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-.comment-bubble { background: #f1f5f9; padding: 8px 12px; border-radius: 15px 15px 15px 0; font-size: 0.85rem; color: #334155; max-width: 85%; align-self: flex-start; }
-html.theme-angry .comment-bubble { background: #3d3d3d; color: #eee; }
+
+.comment-bubble { 
+    background: #f1f5f9; 
+    padding: 8px 12px; 
+    border-radius: 15px 15px 15px 0; 
+    font-size: 0.85rem; 
+    color: #334155; 
+    max-width: 85%; 
+    align-self: flex-start; 
+}
+
+/* ✅ 修正：生氣模式下的留言泡泡背景與文字 */
+html.theme-angry .comment-bubble { 
+    background: #3d3d3d; 
+    color: #f1f5f9; 
+}
+
 .comment-user { font-weight: bold; color: var(--accent-color); margin-right: 5px; }
-.my-comment { align-self: flex-end !important; background: #e0f2fe !important; border-radius: 15px 15px 0 15px !important; border-right: 3px solid var(--accent-color) !important; }
+
+/* ✅ 修正：自己的留言靠右對齊 */
+.my-comment { 
+    align-self: flex-end !important; 
+    background: #e0f2fe !important; 
+    border-radius: 15px 15px 0 15px !important; 
+    border-right: 3px solid var(--accent-color) !important; 
+    color: #334155 !important;
+}
+
+/* ✅ 修正：生氣模式下自己的留言泡泡顏色，避免看不清楚 */
+html.theme-angry .my-comment {
+    background: #4a1a1a !important;
+    color: #f1f5f9 !important;
+    border-right-color: #ef4444 !important;
+}
 button { background: var(--accent-color); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; }
 .switch { position: relative; display: inline-block; width: 45px; height: 22px; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #add8e6; transition: .4s; border-radius: 34px; }
