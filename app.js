@@ -76,7 +76,7 @@ function initLogic() {
     }
 
     const happyOptions = ["1 (讚讚)", "2 (不錯不錯)", "3 (開心撒花)", "4 (有夠快樂)", "5 (比葳孟幸福)"];
-    const angryOptions = ["1 (煩躁)", "2 (白眼)", "3 (操)", "4 (操操操)", "5 (離職幹)"];
+    const angryOptions = ["1 (微煩躁)", "2 (無奈)", "3 (心累)", "4 (生氣)", "5 (崩潰邊緣)"];
 
     function updateEmotionOptions(isAngry) {
         const options = isAngry ? angryOptions : happyOptions;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公司今天表現的怎麼樣? ☁️🔥</title>
+    <title>大家今天還好嗎? ☁️🔥</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <header>
         <div class="logo">
             <span class="happy-icon">☁️ 泡泡基地</span>
-            <span class="angry-icon">💢 媽蛋破公司</span>
+            <span class="angry-icon">💢 充滿挑戰的一天</span>
         </div>
         <div class="auth-section">
             <button id="login-btn">Google 登入</button>
@@ -109,15 +109,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, setDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDEPwpz4a0jbCWZ_N-peJydCPVTHg4TU-A",
-            authDomain: "mood-calendar-sail.firebaseapp.com",
-            projectId: "mood-calendar-sail",
-            storageBucket: "mood-calendar-sail.firebasestorage.app",
-            messagingSenderId: "962446738343",
-            appId: "1:962446738343:web:418d197331ee97cd46ec82"
-        };
+        
+        // 從外部檔案引入設定！
+        import { firebaseConfig } from './config.js';
 
         const app = initializeApp(firebaseConfig);
         window.db = getFirestore(app);
